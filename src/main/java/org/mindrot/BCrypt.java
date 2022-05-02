@@ -54,7 +54,7 @@ import java.security.SecureRandom;
  * String stronger_salt = BCrypt.gensalt(12)<br />
  * </code>
  * <p>
- * The amount of work increases exponentially (2**log_rounds), so 
+ * The amount of work increases exponentially (2**log_rounds), so
  * each increment is twice as much work. The default log_rounds is
  * 10, and the valid range is 4 to 30.
  *
@@ -388,7 +388,7 @@ public class BCrypt {
 	private static String encode_base64(byte d[], int len)
 		throws IllegalArgumentException {
 		int off = 0;
-		StringBuffer rs = new StringBuffer();
+		StringBuilder rs = new StringBuilder();
 		int c1, c2;
 
 		if (len <= 0 || len > d.length)
@@ -425,9 +425,10 @@ public class BCrypt {
 	 * @return	the decoded value of x
 	 */
 	private static byte char64(char x) {
-		if ((int)x < 0 || (int)x > index_64.length)
+		int index = x;
+		if (index >= index_64.length)
 			return -1;
-		return index_64[(int)x];
+		return index_64[index];
 	}
 
 	/**
@@ -441,9 +442,9 @@ public class BCrypt {
 	 */
 	private static byte[] decode_base64(String s, int maxolen)
 		throws IllegalArgumentException {
-		StringBuffer rs = new StringBuffer();
+		StringBuilder rs = new StringBuilder();
 		int off = 0, slen = s.length(), olen = 0;
-		byte ret[];
+		byte[] ret;
 		byte c1, c2, c3, c4, o;
 
 		if (maxolen <= 0)
@@ -654,7 +655,7 @@ public class BCrypt {
 		byte passwordb[], saltb[], hashed[];
 		char minor = (char)0;
 		int rounds, off = 0;
-		StringBuffer rs = new StringBuffer();
+		StringBuilder rs = new StringBuilder();
 
 		if (salt.charAt(0) != '$' || salt.charAt(1) != '2')
 			throw new IllegalArgumentException ("Invalid salt version");
@@ -689,7 +690,7 @@ public class BCrypt {
 			 * this by capping the password length to 72
 			 * characters (excluding the NUL-terminator,
 			 * therefore 73).
-			 * 
+			 *
 			 * There should technically be no need to do
 			 * so explicitly here since the encryption
 			 * function only uses the first two 72 bytes
@@ -738,8 +739,8 @@ public class BCrypt {
 	 * @return	an encoded salt value
 	 */
 	public static String gensalt(int log_rounds, char minor, SecureRandom random) {
-		StringBuffer rs = new StringBuffer();
-		byte rnd[] = new byte[BCRYPT_SALT_LEN];
+		StringBuilder rs = new StringBuilder();
+		byte[] rnd = new byte[BCRYPT_SALT_LEN];
 
 		random.nextBytes(rnd);
 
@@ -747,7 +748,7 @@ public class BCrypt {
 			throw new IllegalArgumentException(
 				"unsupported minor revision: " + minor);
 
-		rs.append("$2" + minor + "$");
+		rs.append("$2").append(minor).append("$");
 		if (log_rounds < 10)
 			rs.append("0");
 		if (log_rounds > 30) {
